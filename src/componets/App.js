@@ -1,63 +1,72 @@
-import Card from "./Card";
-import Header from "./Header";
-import Footer from "./Footer";
-import Button from "./Button";
+/* Actions, Viewer, Title */
 
-const skills = ["HTML", "css", "js Es5", "js Es6", "React"];
+import Titolo from "./Titolo";
+import Viewer from "./Viewer";
+import Actions from "./Actions";
+import StoricoTempi from "./StoricoTempi";
 
-const heroes = [
-  {
-    id: 1,
-    nome: "Tony",
-    cognome: "Stark",
-    eta: "40",
-    skill: "React",
-  },
-  {
-    id: 2,
-    nome: "Steve",
-    cognome: "Rogers",
-    eta: "102",
-    skill: "Angular",
-  },
-  {
-    id: 3,                  //const id = hero.id
-    nome: "Bruce",          //const nome = hero.nome
-    cognome: "Banner",
-    eta: "39",
-    skill: "Vue",
-  },
-];
+import React from "react";
+
+const STATO_INIZIALE = {
+  tempo: 0,
+  btnStart: true,
+  btnPause: false,
+  list: []
+}
+
+class App extends React.Component {
+  constructor(props) {
+    super(props)
+    //inizializzazione stato
+    this.state = STATO_INIZIALE
+  }
+
+  startTimer = () => {
+    this.timerInterval = setInterval(() => {
+      this.setState({
+        tempo: this.state.tempo + 1,
+        btnStart: false,
+        btnPause: true
+      })
+    }, 10)
+  }
+
+  pauseTimer = () => {
+    //non sarebbe possibile fare un semplice push, sia perchè
+    //this.state va considerato come oggetto immutabile e sia 
+    //perchè push ritornerebbe ritorna la lunghezza dell'array, non l'array mutato
+    clearInterval(this.timerInterval)
+    this.setState({
+      btnStart: true,
+      btnPause: false,
+      list: [this.state.tempo, ...this.state.list] //inserisce all'inizio dell'array
+      //list: this.state.list.concat([this.state.tempo]) // concatena alla fine dell'array
+    })
+  }
+
+  resetTimer = () => {
+    clearInterval(this.timerInterval)
+    this.setState({
+      tempo: 0,
+      btnStart: true,
+      btnPause: false,
+      list: []
+    })
+  }
 
 
-function App(){
-  return (
-    <div>
-      <Header />
-      <div className="cardContainer">
-        {heroes.map((hero) => {
-          const {id, nome, cognome, eta, skill} = hero; // const nome = hero.nome
-          return(
-              <Card key={id} nome={nome} cognome={cognome} eta={eta} skill={skill} />
-          );
-        })}
+  render() {
+    console.log(this.state)
+    return (
+      <div className="App">
+        <Titolo title="Timer!" />
+        <Viewer time={this.state.tempo} btnStart={!this.state.btnStart} />
+        <Actions start={this.startTimer} pause={this.pauseTimer} reset={this.resetTimer} btnStart={this.state.btnStart} btnPause={this.state.btnPause} />
+        <StoricoTempi tempi={this.state.list} btnStart={this.state.btnStart}/>
       </div>
-      <Footer />
-    </div>
-  );
+    )
+  }
+
 }
 
 export default App;
-
-//   const {id,nome,cognome,eta,skill} = heroes;
-//   function Hero(props){
-//       <h2>Io {props.nome} {props.cognome} ho {props.eta} anni, conosco molto bene {props.skill}</h2>
-
-//   }
-
-//     function App(){
-//         const heroList = heroes.maps( (hero) => <Hero zeno={hero} />)
-//         return(
-//             heroList
-//         )
-//     }
